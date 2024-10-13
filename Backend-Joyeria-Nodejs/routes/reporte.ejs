@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    table{
+        font-family: arial,sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td,th{
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+</style>
+<body>
+    <h3 style="text-align: center;">Sistema de Administración de Joyeria</h3>
+    <table>
+        <tr>
+            <th>Nombre: <%= nombre %></th>
+            <th>Email: <%= email %></th>
+        </tr>
+        <tr>
+            <th>Numero de Contacto: <%= numeroContacto %></th>
+            <th>Metodo de Pago: <%= metodoPago %></th>
+        </tr>
+    </table>
+
+    <h3>Detalles del Producto:</h3>
+    <table>
+      <tr>
+         <th>Nombre</th>
+         <th>Categoria</th>
+         <th>Cantidad</th>
+         <th>Precio</th>
+         <th>Sub Total</th>
+      </tr>
+     <% if(detallesProducto.length > 0) { %>
+        <% detallesProducto.forEach(Producto =>{ %>
+            <tr>
+                <td><%= Producto.nombre %></td>
+                <td><%= Producto.categoria %></td>
+                <td><%= Producto.cantidad %></td>
+                <td><%= Producto.precio %></td>
+                <td><%= Producto.total %></td>
+            </tr>
+            <%});%>
+            <%}%>
+    </table>
+    <h3>Total: <%= cantidadTotal %></h3>
+    <h3>Gracias por visitarnos. Te esperamos nuevamente!!!</h3>
+</body>
+</html>

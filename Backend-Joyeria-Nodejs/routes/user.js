@@ -9,14 +9,14 @@ var auth = require('../services/authentication');
 var checkRole = require('../services/checkRole');
 
 //API de registro de usuario
-router.post('/singup', (req, res) => {
+router.post('/signup', (req, res) => {
     let user = req.body;
-    query = "select email,contraseña,rol,status from user where email=?"
+    query = "select email,contrasena,rol,status from user where email=?";
     connection.query(query, [user.email], (err, results) => {
         if (!err) {
             if (results.length <= 0) {
-                query = "insert into user(nombre,numeroContacto,email,contraseña,status,rol) values(?,?,?,?,'false','user')";
-                connection.query(query, [user.nombre, user.numeroContacto, user.email, user.contraseña], (err, results) => {
+                query = "insert into user(nombre,numeroContacto,email,contrasena,status,rol) values(?,?,?,?,'false','user')";
+                connection.query(query, [user.nombre, user.numeroContacto, user.email, user.contrasena], (err, results) => {
                     if (!err) {
                         return res.status(200).json({ message: "Registrado con exito." });
                     }
@@ -39,16 +39,16 @@ router.post('/singup', (req, res) => {
 //API de inicio de sesion
 router.post('/login', (req, res) => {
     const user = req.body;
-    query = "select email,contraseña,rol,status from user where email=?";
+    query = "select email,contrasena,rol,status from user where email=?";
     connection.query(query, [user.email], (err, results) => {
         if (!err) {
-            if (results.length <= 0 || results[0].contraseña != user.contraseña) {
+            if (results.length <= 0 || results[0].contrasena != user.contrasena) {
                 return res.status(401).json({ message: "Usuario o Contraseña incorrectos" });
             }
             else if (results[0].status === 'false') {
                 return res.status(401).json({ message: "Espere la aprobación del administrador" });
             }
-            else if (results[0].contraseña == user.contraseña) {
+            else if (results[0].contrasena == user.contrasena) {
                 const response = { email: results[0].email, rol: results[0].rol }
                 const accessToken = jwt.sign(response, process.env.ACCESS_TOKEN, { expiresIn: '8h' })
                 res.status(200).json({ token: accessToken });
@@ -75,7 +75,7 @@ var transporter = nodemailer.createTransport({
 
 router.post('/forgotPassword', (req, res) => {
     const user = req.body;
-    query = "select email,contraseña from user where email=?";
+    query = "select email,contrasena from user where email=?";
     connection.query(query, [user.email], (err, results) => {
         if (!err) {
             if (results.length <= 0) {
@@ -86,7 +86,7 @@ router.post('/forgotPassword', (req, res) => {
                     from: process.env.EMAIL,
                     to: results[0].email,
                     subject: 'Contraseña del proyecto joyeria',
-                    html: '<p><b>Sus datos para el inicio de sesion para el proyecto joyeria</b><br><b>Correo electronico: </b>' + results[0].email + '<br><b>Contraseña: </b>' + results[0].contraseña + '<br><a href="http://localhost:4200/">Click aqui para iniciar sesion</a></p>'
+                    html: '<p><b>Sus datos para el inicio de sesion para el proyecto joyeria</b><br><b>Correo electronico: </b>' + results[0].email + '<br><b>Contraseña: </b>' + results[0].contrasena + '<br><a href="http://localhost:4200/">Click aqui para iniciar sesion</a></p>'
                 };
                 transporter.sendMail(mailOptions, function (error, info) {
                     if (error) {
@@ -144,14 +144,14 @@ router.post('/changePassword', auth.authenticateToken, (req, res) => {
     const user = req.body;
     const email = res.locals.email;
     console.log(email);
-    var query = "select *from user where email=? and contraseña=?";
+    var query = "select *from user where email=? and contrasena=?";
     connection.query(query, [email, user.oldPassword], (err, results) => {
         if (!err) {
             if (results.length <= 0) {
                 return res.status(400).json({ mensaje: "La contraseña anterior es incorrecta" });
             }
-            else if (results[0].contraseña == user.oldPassword) {
-                query = "update user set contraseña=? where email=?";
+            else if (results[0].contrasena == user.oldPassword) {
+                query = "update user set contrasena=? where email=?";
                 connection.query(query, [user.newPassword, email], (err, results) => {
                     if (!err) {
                         return res.status(200).json({ mensaje: "La contraseña se actualizo con exito" })

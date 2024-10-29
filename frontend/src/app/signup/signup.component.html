@@ -1,51 +1,115 @@
 <mat-toolbar color="primary">
-    <mat-toolbar-row fxLayout="row">
-        <span class="title-center">Registrate</span>
-    </mat-toolbar-row>
+  <mat-toolbar-row fxLayout="row">
+    <span class="title-center">Registrate</span>
+  </mat-toolbar-row>
 </mat-toolbar>
 <mat-dialog-content class="mat-typography">
-<form [formGroup]="signupForm">
+  <form [formGroup]="signupForm">
     <div fxFlex fxLayout="column">
-        <mat-form-field appearance="fill" fxFlex>
-            <mat-label>Nombre</mat-label>
-            <input matInput formControlName="nombre" placeholder="Ingrese su nombre" required>
-            <mat-error *ngIf="signupForm.controls.nombre.touched && signupForm.controls.nombre.invalid">
-                <span *ngIf="signupForm.controls.nombre.errors.required">Este campo es obligatorio.</span>
-                <span *ngIf="signupForm.controls.nombre.errors.pattern">Este campo es invalido.</span>
-            </mat-error>
-        </mat-form-field>
+      <mat-form-field appearance="fill" fxFlex>
+        <mat-label>Nombre</mat-label>
+        <input
+          matInput
+          formControlName="nombre"
+          placeholder="Ingrese su nombre"
+          required
+        />
+        <mat-error
+          *ngIf="
+            signupForm.controls.nombre.touched &&
+            signupForm.controls.nombre.invalid
+          "
+        >
+          <span *ngIf="signupForm.controls.nombre.errors.required"
+            >Este campo es obligatorio.</span
+          >
+          <span *ngIf="signupForm.controls.nombre.errors.pattern"
+            >Este campo es invalido.</span
+          >
+        </mat-error>
+      </mat-form-field>
 
-        <mat-form-field appearance="fill" fxFlex>
-            <mat-label>Numero de contacto</mat-label>
-            <input matInput formControlName="numeroContacto" placeholder="Ingrese su numero" required>
-            <mat-error *ngIf="signupForm.controls.numeroContacto.touched && signupForm.controls.numeroContacto.invalid">
-                <span *ngIf="signupForm.controls.numeroContacto.errors.required">Este campo es obligatorio.</span>
-                <span *ngIf="signupForm.controls.numeroContacto.errors.pattern">Este campo es invalido.</span>
-            </mat-error>
-        </mat-form-field>
+      <mat-form-field appearance="fill" fxFlex>
+        <mat-label>Numero de contacto</mat-label>
+        <input
+          matInput
+          formControlName="numeroContacto"
+          placeholder="Ingrese su numero"
+          required
+        />
+        <mat-error
+          *ngIf="
+            signupForm.controls.numeroContacto.touched &&
+            signupForm.controls.numeroContacto.invalid
+          "
+        >
+          <span *ngIf="signupForm.controls.numeroContacto.errors.required"
+            >Este campo es obligatorio.</span
+          >
+          <span *ngIf="signupForm.controls.numeroContacto.errors.pattern"
+            >Este campo es invalido.</span
+          >
+        </mat-error>
+      </mat-form-field>
 
-        <mat-form-field appearance="fill" fxFlex>
-            <mat-label>Email</mat-label>
-            <input matInput formControlName="email" placeholder="Ingrese su correo electronico" required>
-            <mat-error *ngIf="signupForm.controls.email.touched && signupForm.controls.email.invalid">
-                <span *ngIf="signupForm.controls.email.errors.required">Este campo es obligatorio.</span>
-                <span *ngIf="signupForm.controls.email.errors.pattern">Este campo es invalido.</span>
-            </mat-error>
-        </mat-form-field>
+      <mat-form-field appearance="fill" fxFlex>
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          formControlName="email"
+          placeholder="Ingrese su correo electronico"
+          required
+        />
+        <mat-error
+          *ngIf="
+            signupForm.controls.email.touched &&
+            signupForm.controls.email.invalid
+          "
+        >
+          <span *ngIf="signupForm.controls.email.errors.required"
+            >Este campo es obligatorio.</span
+          >
+          <span *ngIf="signupForm.controls.email.errors.pattern"
+            >Este campo es invalido.</span
+          >
+        </mat-error>
+      </mat-form-field>
 
-        <mat-form-field appearance="fill" fxFlex>
-            <mat-label>Contraseña</mat-label>
-            <input matInput formControlName="contrasena" placeholder="Ingrese su contraseña" type="password" required>
-            <mat-error *ngIf="signupForm.controls.contrasena.touched && signupForm.controls.contrasena.invalid">
-                <span *ngIf="signupForm.controls.contrasena.errors.required">Este campo es obligatorio.</span>
-                <span *ngIf="signupForm.controls.contrasena.errors.pattern">Este campo es invalido.</span>
-            </mat-error>
-        </mat-form-field>
+      <mat-form-field appearance="fill" fxFlex>
+        <mat-label>Contraseña</mat-label>
+        <input
+          matInput
+          formControlName="contrasena"
+          placeholder="Ingrese su contraseña"
+          type="password"
+          required
+        />
+        <mat-error
+          *ngIf="
+            signupForm.controls.contrasena.touched &&
+            signupForm.controls.contrasena.invalid
+          "
+        >
+          <span *ngIf="signupForm.controls.contrasena.errors.required"
+            >Este campo es obligatorio.</span
+          >
+          <span *ngIf="signupForm.controls.contrasena.errors.pattern"
+            >Este campo es invalido.</span
+          >
+        </mat-error>
+      </mat-form-field>
     </div>
-</form>
+  </form>
 </mat-dialog-content>
 <mat-dialog-actions align="center">
-<button mat-raised-button color="primary" type="submit" (click)="handleSubmit()"
-[disabled]="!(signupForm.valid && signupForm.dirty)">Registrar</button>
-<button mat-raised-button color="primary" mat-dialog-close>Cerrar</button>
+  <button
+    mat-raised-button
+    color="primary"
+    type="submit"
+    (click)="handleSubmit()"
+    [disabled]="!(signupForm.valid && signupForm.dirty)"
+  >
+    Registrar
+  </button>
+  <button mat-raised-button color="primary" mat-dialog-close>Cerrar</button>
 </mat-dialog-actions>

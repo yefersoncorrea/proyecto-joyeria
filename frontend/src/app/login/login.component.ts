@@ -10,48 +10,56 @@ import { GlobalConstants } from '../shared/global-constants';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-  loginForm:any = FormGroup;
-  responseMessage:any;
+  loginForm: any = FormGroup;
+  responseMessage: any;
 
-  constructor(private formBuilder:FormBuilder,
+  constructor(
+    private formBuilder: FormBuilder,
     private router: Router,
     private userService: UserService,
     public dialogRef: MatDialogRef<LoginComponent>,
     private ngxService: NgxUiLoaderService,
-    private snackbarService: SnackbarService) { }
+    private snackbarService: SnackbarService,
+  ) {}
 
   ngOnInit(): void {
+    this.buildForm();
+  }
+
+  private buildForm(): void {
     this.loginForm = this.formBuilder.group({
-      email:[null,[Validators.required,Validators.pattern(GlobalConstants.emailRegex)]],
-      contrasena:[null,Validators.required]
-    })
+      email: [
+        null,
+        [Validators.required, Validators.pattern(GlobalConstants.emailRegex)],
+      ],
+      contrasena: [null, Validators.required],
+    });
   }
 
-  handleSubmit(){
+  handleSubmit() {
     this.ngxService.start();
-    var formData = this.loginForm.value;
-    var data = {
-      email: formData.email,
-      contrasena: formData.contrasena
-    }
-    this.userService.login(data).subscribe((response:any)=>{
-      this.ngxService.stop();
-      this.dialogRef.close();
-      localStorage.setItem('token',response.token);
-      this.router.navigate(['/cafe/dashboard']);
-    },(error)=>{
-      this.ngxService.stop();
-      if(error.error?.message){
-        this.responseMessage = error.error?.message;
-      }
-      else{
-        this.responseMessage = GlobalConstants.genericError;
-      }
-      this.snackbarService.openSnackBar(this.responseMessage,GlobalConstants.error);
-    })
+    this.userService.login(this.loginForm.value).subscribe(
+      (response: any) => {
+        this.ngxService.stop();
+        this.dialogRef.close();
+        localStorage.setItem('token', response.token);
+        this.router.navigate(['/cafe/dashboard']);
+      },
+      (error) => {
+        this.ngxService.stop();
+        if (error.error?.message) {
+          this.responseMessage = error.error?.message;
+        } else {
+          this.responseMessage = GlobalConstants.genericError;
+        }
+        this.snackbarService.openSnackBar(
+          this.responseMessage,
+          GlobalConstants.error,
+        );
+      },
+    );
   }
-
 }

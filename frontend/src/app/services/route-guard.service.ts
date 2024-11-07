@@ -15,9 +15,6 @@ export class RouteGuardService {
     private snackbarService:SnackbarService) { }
 
     canActivate(route:ActivatedRouteSnapshot):boolean{
-      let expectedRoleArray = route.data;
-      expectedRoleArray = expectedRoleArray.expectedRole;
-
       const token:any = localStorage.getItem('token');
       var tokenPayload:any;
       try{
@@ -28,16 +25,8 @@ export class RouteGuardService {
         this.router.navigate(['/']);
       }
 
-      let checkRole = false;
-
-      for(let i=0;i<expectedRoleArray.length;i++){
-        if(expectedRoleArray[i] == tokenPayload.role){
-          checkRole = true;
-        }
-      }
-
-      if(tokenPayload.role =='user' || tokenPayload.role == 'admin'){
-        if(this.auth.isAuthenticated() && checkRole){
+      if(['admin','user'].includes(tokenPayload.rol)){
+        if(this.auth.isAuthenticated()){
           return true;
         }
         this.snackbarService.openSnackBar(GlobalConstants.unauthorized,GlobalConstants.error);
@@ -46,8 +35,7 @@ export class RouteGuardService {
       }
       else{
         this.router.navigate(['/']);
-        localStorage.clear();
         return false;
       }
-    }
+      }
 }

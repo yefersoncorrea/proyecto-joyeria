@@ -42,18 +42,12 @@ router.post("/login", (req, res) => {
   connection.query(query, [user.email], (err, results) => {
     if (!err) {
       if (results.length <= 0 || results[0].contrasena != user.contrasena) {
-        return res
-          .status(401)
-          .json({ message: "Usuario o Contraseña incorrectos" });
+        return res.status(401).json({ message: "Usuario o Contraseña incorrectos" });
       } else if (results[0].status === "false") {
-        return res
-          .status(401)
-          .json({ message: "Espere la aprobación del administrador" });
+        return res.status(401).json({ message: "Espere la aprobación del administrador" });
       } else if (results[0].contrasena == user.contrasena) {
         const response = { email: results[0].email, rol: results[0].rol };
-        const accessToken = jwt.sign(response, process.env.ACCESS_TOKEN, {
-          expiresIn: "8h",
-        });
+        const accessToken = jwt.sign(response, process.env.ACCESS_TOKEN, {expiresIn: "8h"});
         res.status(200).json({ token: accessToken });
       } else {
         return res.status(400).json({

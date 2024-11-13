@@ -132,11 +132,11 @@ router.patch(
         if (results.affectedRows == 0) {
           return res
             .status(404)
-            .json({ mensaje: "El id del usuario no existe" });
+            .json({ message: "El id del usuario no existe" });
         }
         return res
           .status(200)
-          .json({ mensaje: "Usuario actualizado exitosamente" });
+          .json({ message: "Usuario actualizado exitosamente" });
       } else {
         return res.status(500).json(err);
       }
@@ -166,7 +166,7 @@ router.post("/changePassword", auth.authenticateToken, (req, res) => {
           if (!err) {
             return res
               .status(200)
-              .json({ mensaje: "La contraseña se actualizo con exito" });
+              .json({ message: "La contraseña se actualizo con exito" });
           } else {
             return res.status(500).json(err);
           }
@@ -174,7 +174,7 @@ router.post("/changePassword", auth.authenticateToken, (req, res) => {
       } else {
         return res
           .status(400)
-          .json({ mensaje: "Algo salio mal. Intentelo de nuevo mas tarde" });
+          .json({ message: "Algo salio mal. Intentelo de nuevo mas tarde" });
       }
     } else {
       return res.status(500).json(err);

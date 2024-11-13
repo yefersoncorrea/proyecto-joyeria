@@ -1,0 +1,148 @@
+<mat-card>
+    <b><span>Administrar Pedido</span></b>
+    <button mat-flat-button color="primary" class="float-right" [disabled]="validateSubmit()" (click)="submitAction()">Enviar y Recibir Factura</button>
+</mat-card>
+<hr>
+<mat-card>
+    <b><span>Detalles del Cliente:</span></b>
+    <form [formGroup]="manageOrderForm">
+        <div fxFlex fxLayout="column">
+            <div fxLayout="row wrap">
+                <mat-form-field appearance="fill" fxFlex>
+                    <mat-label>Nombre</mat-label>
+                    <input matInput formControlName="nombre" placeholder="Nombre" required>
+                    <mat-error *ngIf="manageOrderForm.controls.nombre.touched && manageOrderForm.controls.nombre.invalid">
+                        <span *ngIf="manageOrderForm.controls.nombre.errors.required">Este campo es obligatorio.</span>
+                        <span *ngIf="manageOrderForm.controls.nombre.errors.pattern">Este campo es invalido.</span>
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" fxFlex>
+                    <mat-label>Correo Electronico</mat-label>
+                    <input matInput formControlName="email" placeholder="Correo Electronico" required>
+                    <mat-error *ngIf="manageOrderForm.controls.email.touched && manageOrderForm.controls.email.invalid">
+                        <span *ngIf="manageOrderForm.controls.email.errors.required">Este campo es obligatorio.</span>
+                        <span *ngIf="manageOrderForm.controls.email.errors.pattern">Este campo es invalido.</span>
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" fxFlex>
+                    <mat-label>Numero de Contacto</mat-label>
+                    <input matInput formControlName="numeroContacto" placeholder="Numero de Contacto" required>
+                    <mat-error *ngIf="manageOrderForm.controls.numeroContacto.touched && manageOrderForm.controls.numeroContacto.invalid">
+                        <span *ngIf="manageOrderForm.controls.numeroContacto.errors.required">Este campo es obligatorio.</span>
+                        <span *ngIf="manageOrderForm.controls.numeroContacto.errors.pattern">Este campo es invalido.</span>
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="fill" fxFlex>
+                    <mat-label>Metodo de Pago</mat-label>
+                    <mat-select formControlName="metodoPago" placeholder="Metodo de Pago" required>
+                        <mat-option value="Efectivo">Efectivo</mat-option>
+                        <mat-option value="Tarjeta de Credito">Tarjeta de Credito</mat-option>
+                        <mat-option value="Tarjeta de Debito">Tarjeta de Debito</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="manageOrderForm.controls.metodoPago.touched && manageOrderForm.controls.metodoPago.invalid">
+                        <span *ngIf="manageOrderForm.controls.metodoPago.errors.required">Este campo es obligatorio.</span>
+                        <span *ngIf="manageOrderForm.controls.metodoPago.errors.pattern">Este campo es invalido.</span>
+                    </mat-error>
+                </mat-form-field>
+            </div>
+        </div>
+    </form>
+</mat-card>
+<hr>
+<mat-card>
+<b><span>Seleccionar Producto:</span></b>
+<form [formGroup]="manageOrderForm">
+    <div fxFlex fxLayout="column">
+        <div fxLayout="row wrap">
+            <mat-form-field appearance="fill" fxFlex>
+                <mat-label>Categoria</mat-label>
+                <mat-select formControlName="categoria" (selectionChange)="getProductsByCategory($event.value)">
+                    <mat-option *ngFor="let categoria of categorys" [value]="categoria">{{categoria.nombre}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" fxFlex>
+                <mat-label>Producto</mat-label>
+                <mat-select formControlName="producto" (selectionChange)="getProductDetails($event.value)">
+                    <mat-option *ngFor="let Producto of products" [value]="Producto">{{Producto.nombre}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" fxFlex>
+                <mat-label>Precio</mat-label>
+                <input matInput formControlName="precio" placeholder="Precio" required readonly>
+                <mat-error *ngIf="manageOrderForm.controls.precio.touched && manageOrderForm.controls.precio.invalid">
+                    <span *ngIf="manageOrderForm.controls.precio.errors.required">Este campo es obligatorio.</span>
+                    <span *ngIf="manageOrderForm.controls.precio.errors.pattern">Este campo es invalido.</span>
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" fxFlex>
+                <mat-label>Cantidad</mat-label>
+                <input matInput formControlName="cantidad" placeholder="Cantidad" required (keyup)="setQuantity($event)" #input>
+                <mat-error *ngIf="manageOrderForm.controls.cantidad.touched && manageOrderForm.controls.cantidad.invalid">
+                    <span *ngIf="manageOrderForm.controls.cantidad.errors.required">Este campo es obligatorio.</span>
+                    <span *ngIf="manageOrderForm.controls.cantidad.errors.pattern">Este campo es invalido.</span>
+                </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" fxFlex>
+                <mat-label>Total</mat-label>
+                <input matInput formControlName="total" placeholder="Total" required readonly>
+                <mat-error *ngIf="manageOrderForm.controls.total.touched && manageOrderForm.controls.total.invalid">
+                    <span *ngIf="manageOrderForm.controls.total.errors.required">Este campo es obligatorio.</span>
+                    <span *ngIf="manageOrderForm.controls.total.errors.pattern">Este campo es invalido.</span>
+                </mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+</form>
+<div>
+    <button mat-flat-button color="primary" [disabled]="validateProductAdd()" (click)="add()">Agregar</button>
+    <button mat-flat-button color="primary" class="float-right">Cantidad Total: {{cantidadTotal}}</button>
+</div>
+</mat-card>
+<hr>
+<div class="responsive_table">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+        <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef>Nombre</th>
+            <td mat-cell *matCellDef="let element">{{element.nombre}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="categoria">
+            <th mat-header-cell *matHeaderCellDef>Categoria</th>
+            <td mat-cell *matCellDef="let element">{{element.categoria}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="precio">
+            <th mat-header-cell *matHeaderCellDef>Precio</th>
+            <td mat-cell *matCellDef="let element">{{element.precio}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="cantidad">
+            <th mat-header-cell *matHeaderCellDef>Cantidad</th>
+            <td mat-cell *matCellDef="let element">{{element.cantidad}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="total">
+            <th mat-header-cell *matHeaderCellDef>Total</th>
+            <td mat-cell *matCellDef="let element">{{element.total}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="edit">
+            <th mat-header-cell *matHeaderCellDef>Eliminar</th>
+            <td mat-cell *matCellDef="let element;let i = index" class="action-link">
+                <button mat-icon-button color="primary" matTooltip="Eliminar" (click)="handleDeleteAction(i,element)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky:true"></tr>
+        <tr mat-row *matRowDef="let row;columns:displayedColumns;"></tr>
+    </table>
+</div>

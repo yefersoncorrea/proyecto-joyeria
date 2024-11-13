@@ -10,7 +10,7 @@ router.post('/add', auth.authenticateToken, checkRole.checkRole, (req, res, next
     query = "insert into categoria (nombre) values(?)";
     connection.query(query, [categoria.nombre], (err, results) => {
         if (!err) {
-            return res.status(200).json({ mensaje: "Categoria agregada con exito" });
+            return res.status(200).json({ message: "Categoria agregada con exito" });
         }
         else {
             return res.status(500).json(err);
@@ -37,9 +37,9 @@ router.patch('/update', auth.authenticateToken, checkRole.checkRole, (req, res, 
     connection.query(query, [producto.nombre, producto.id], (err, results) => {
         if (!err) {
             if (results.affectedRows == 0) {
-                return res.status(404).json({ mensaje: "id de categoria no encontrada" });
+                return res.status(404).json({ message: "id de categoria no encontrada" });
             }
-            return res.status(200).json({ mensaje: "Categoria actualizada exitosamente" });
+            return res.status(200).json({ message: "Categoria actualizada exitosamente" });
         }
         else {
             return res.status(500).json(err);

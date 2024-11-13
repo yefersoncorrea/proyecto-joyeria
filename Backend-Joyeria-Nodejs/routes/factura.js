@@ -89,9 +89,9 @@ router.delete('/delete/:id', auth.authenticateToken, (req, res, next) => {
     connection.query(query, [id], (err, results) => {
         if (!err) {
             if (results.affectedRows == 0) {
-                return res.status(404).json({ mensaje: "id de factura no encontrado." });
+                return res.status(404).json({ message: "id de factura no encontrado." });
             }
-            return res.status(200).json({ mensaje: "Factura eliminada exitosamente." });
+            return res.status(200).json({ message: "Factura eliminada exitosamente." });
         }
         else {
             return res.status(500).json(err);

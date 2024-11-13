@@ -27,6 +27,14 @@ export class UserService {
   }
 
   changePassword(data:any){
-    return this.httpClient.post(this.url + "/user/changePassword", data);
+    return this.httpClient.post(this.url + '/user/changePassword', data);
+  }
+
+  getUsers(){
+    return this.httpClient.get(this.url+'/user/get/');
+  }
+
+  update(data:any){
+    return this.httpClient.patch(this.url+'/user/update/',data);
   }
 }

@@ -10,7 +10,10 @@ export interface Menu {
 const MENUITEMS = [
     { state: 'dashboard', name: 'dashboard', icon: 'dashboard', role: '' },
     { state: 'categoria', name: 'Administrar Categoria', icon: 'category', role: '' },
-    { state: 'producto', name: 'Administrar Producto', icon: 'inventory_2', role: '' }
+    { state: 'producto', name: 'Administrar Producto', icon: 'inventory_2', role: '' },
+    { state: 'pedido', name: 'Administrar Pedido', icon: 'list_alt', role: '' },
+    { state: 'factura', name: 'Ver Factura', icon: 'import_contacts', role: '' },
+    { state: 'user', name: 'Ver Usuario', icon: 'people', role: '' }
 ];
 
 @Injectable()

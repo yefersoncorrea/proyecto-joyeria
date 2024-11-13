@@ -10,7 +10,7 @@ router.post('/add', auth.authenticateToken, checkRole.checkRole, (req, res) => {
     var query = "insert into producto (nombre,categoriaId,descripcion,precio,status) values(?,?,?,?,'true')";
     connection.query(query, [producto.nombre, producto.categoriaId, producto.descripcion, producto.precio], (err, results) => {
         if (!err) {
-            return res.status(200).json({ mensaje: "El producto se agrego exitosamente." });
+            return res.status(200).json({ message: "El producto se agrego exitosamente." });
         }
         else {
             return res.status(500).json(err);
@@ -63,9 +63,9 @@ router.patch('/update', auth.authenticateToken, checkRole.checkRole, (req, res, 
     connection.query(query, [producto.nombre, producto.categoriaId, producto.descripcion, producto.precio, producto.id], (err, results) => {
         if (!err) {
             if (results.affectedRows == 0) {
-                return res.status(404).json({ mensaje: "id de producto no encontrado" });
+                return res.status(404).json({ message: "id de producto no encontrado" });
             }
-            return res.status(200).json({ mensaje: "Poducto actualizado exitosamente." });
+            return res.status(200).json({ message: "Poducto actualizado exitosamente." });
         }
         else {
             return res.status(500).json(err);
@@ -80,9 +80,9 @@ router.delete('/delete/:id', auth.authenticateToken, checkRole.checkRole, (req, 
     connection.query(query, [id], (err, results) => {
         if (!err) {
             if (results.affectedRows == 0) {
-                return res.status(404).json({ mensaje: "id del producto no se encuentra." });
+                return res.status(404).json({ message: "id del producto no se encuentra." });
             }
-            return res.status(200).json({ mensaje: "El producto se elimino correctamente." });
+            return res.status(200).json({ message: "El producto se elimino correctamente." });
         }
         else {
             return res.status(500).json(err);
@@ -96,9 +96,9 @@ router.patch('/updateStatus',auth.authenticateToken,checkRole.checkRole,(req,res
     connection.query(query,[user.status,user.id],(err,results)=>{
         if(!err){
             if(results.affectedRows == 0){
-                return res.status(404).json({mensaje:"id del producto no se encuentra."});
+                return res.status(404).json({message:"id del producto no se encuentra."});
             }
-            return res.status(200).json({mensaje:"Estado del producto actualizado correctamente."});
+            return res.status(200).json({message:"Estado del producto actualizado correctamente."});
         }
         else{
             return res.status(500).json(err);

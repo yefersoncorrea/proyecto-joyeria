@@ -35,9 +35,17 @@ export class LoginComponent implements OnInit {
         null,
         [Validators.required, Validators.pattern(GlobalConstants.emailRegex)],
       ],
-      contrasena: [null, Validators.required],
+      contrasena: [
+        null,
+        [
+          Validators.required,
+          Validators.minLength(8),
+          Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/),
+        ],
+      ],
     });
   }
+  
 
   handleSubmit() {
     this.ngxService.start();

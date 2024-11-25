@@ -22,6 +22,7 @@
                 <mat-error *ngIf="loginForm.controls.contrasena.touched && loginForm.controls.contrasena.invalid">
                     <span *ngIf="loginForm.controls.contrasena.errors.required">Este campo es obligatorio.</span>
                     <span *ngIf="loginForm.controls.contrasena.errors.pattern">Este campo es invalido.</span>
+                    <span *ngIf="loginForm.controls['contrasena'].hasError('pattern')">La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula, una letra minúscula y un número.</span>
                 </mat-error>
             </mat-form-field>
         </div>

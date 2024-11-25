@@ -12,12 +12,13 @@ var auth = require('../services/authentication');
 router.post('/generateReport', auth.authenticateToken, (req, res) => {
     const generateUuid = uuid.v1();
     const detallesPedido = req.body;
+    const fechaHoraActual = new Date();
     var productDetailsReport = JSON.parse(detallesPedido.detallesProducto);
 
-    query = "insert into factura (nombre,uuid,email,numeroContacto,metodoPago,total,detallesProducto,creadoPor) values(?,?,?,?,?,?,?,?)";
-    connection.query(query, [detallesPedido.nombre, generateUuid, detallesPedido.email, detallesPedido.numeroContacto, detallesPedido.metodoPago, detallesPedido.cantidadTotal, detallesPedido.detallesProducto, res.locals.email], (err, results) => {
+    query = "insert into factura (nombre,uuid,email,numeroContacto,metodoPago,total,detallesProducto,creadoPor, fechaHora) values(?,?,?,?,?,?,?,?,?)";
+    connection.query(query, [detallesPedido.nombre, generateUuid, detallesPedido.email, detallesPedido.numeroContacto, detallesPedido.metodoPago, detallesPedido.cantidadTotal, detallesPedido.detallesProducto, res.locals.email,fechaHoraActual], (err, results) => {
         if (!err) {
-            ejs.renderFile(path.join(__dirname, '', "reporte.ejs"), { detallesProducto: productDetailsReport, nombre: detallesPedido.nombre, email: detallesPedido.email, numeroContacto: detallesPedido.numeroContacto, metodoPago: detallesPedido.metodoPago, cantidadTotal: detallesPedido.cantidadTotal }, (err, results) => {
+            ejs.renderFile(path.join(__dirname, '', "reporte.ejs"), { detallesProducto: productDetailsReport, nombre: detallesPedido.nombre, email: detallesPedido.email, numeroContacto: detallesPedido.numeroContacto, metodoPago: detallesPedido.metodoPago, cantidadTotal: detallesPedido.cantidadTotal,fechaHora: fechaHoraActual }, (err, results) => {
                 if (err) {
                     return res.status(500).json(err);
                 }

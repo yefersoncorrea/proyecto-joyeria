@@ -1,7 +1,7 @@
 const express = require("express");
 const connection = require("../connection");
 const router = express.Router();
-
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
@@ -9,56 +9,96 @@ var auth = require("../services/authentication");
 var checkRole = require("../services/checkRole");
 
 //API de registro de usuario
-router.post("/signup", (req, res) => {
+router.post("/signup", async (req, res) => {
   const user = req.body;
 
-  query = "select email,contrasena,rol,status from user where email=?";
-  connection.query(query, [user.email], (err, results) => {
+  // Expresión regular para validar la contraseña
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+
+  // Validar formato de la contraseña
+  if (!passwordRegex.test(user.contrasena)) {
+    return res.status(400).json({
+      message:
+        "La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula, una letra minúscula y un número.",
+    });
+  }
+
+  // Verificar si el email ya está registrado
+  const query = "SELECT email FROM user WHERE email=?";
+  connection.query(query, [user.email], async (err, results) => {
     if (err) return res.status(500).json(err);
 
-    if (results.length)
-      return res.status(400).json({ message: "Correo Electronico ya existe." });
+    if (results.length) {
+      return res.status(400).json({ message: "Correo electrónico ya registrado." });
+    }
 
-    query =
-      "insert into user(nombre,numeroContacto,email,contrasena,status,rol) values(?,?,?,?,'false','user')";
-    connection.query(
-      query,
-      [user.nombre, user.numeroContacto, user.email, user.contrasena],
-      (err, results) => {
-        if (!err) {
-          return res.status(200).json({ message: "Registrado con exito." });
-        } else {
-          return res.status(500).json(err);
-        }
-      },
-    );
-  });
-});
+    try {
+      // Encriptar la contraseña
+      const hashedPassword = await bcrypt.hash(user.contrasena, 10);
 
-//API de inicio de sesion
-router.post("/login", (req, res) => {
-  const user = req.body;
-  query = "select email,contrasena,rol,status from user where email=?";
-  connection.query(query, [user.email], (err, results) => {
-    if (!err) {
-      if (results.length <= 0 || results[0].contrasena != user.contrasena) {
-        return res.status(401).json({ message: "Usuario o Contraseña incorrectos" });
-      } else if (results[0].status === "false") {
-        return res.status(401).json({ message: "Espere la aprobación del administrador" });
-      } else if (results[0].contrasena == user.contrasena) {
-        const response = { email: results[0].email, rol: results[0].rol };
-        const accessToken = jwt.sign(response, process.env.ACCESS_TOKEN, {expiresIn: "8h"});
-        res.status(200).json({ token: accessToken });
-      } else {
-        return res.status(400).json({
-          message: "Algo salio mal. Por favor intentelo de nuevo mas tarde",
-        });
-      }
-    } else {
-      return res.status(500).json(err);
+      // Insertar usuario en la base de datos
+      const insertQuery =
+        "INSERT INTO user(nombre, numeroContacto, email, contrasena, status, rol) VALUES (?, ?, ?, ?, 'false', 'user')";
+      connection.query(
+        insertQuery,
+        [user.nombre, user.numeroContacto, user.email, hashedPassword],
+        (err, results) => {
+          if (!err) {
+            return res.status(200).json({ message: "Usuario registrado con éxito." });
+          } else {
+            return res.status(500).json(err);
+          }
+        },
+      );
+    } catch (hashError) {
+      return res.status(500).json({ message: "Error al encriptar la contraseña." });
     }
   });
 });
+
+
+//API de inicio de sesion
+router.post("/login", async (req, res) => {
+  const user = req.body;
+
+  // Buscar usuario por email
+  const query = "SELECT email, contrasena, rol, status FROM user WHERE email=?";
+  connection.query(query, [user.email], async (err, results) => {
+    if (err) return res.status(500).json(err);
+
+    if (!results.length) {
+      return res.status(401).json({ message: "Usuario o contraseña incorrectos." });
+    }
+
+    const dbUser = results[0];
+
+    try {
+      // Comparar la contraseña ingresada con el hash en la base de datos
+      const isPasswordMatch = await bcrypt.compare(user.contrasena, dbUser.contrasena);
+
+      if (!isPasswordMatch) {
+        return res.status(401).json({ message: "Usuario o contraseña incorrectos." });
+      }
+
+      if (dbUser.status === "false") {
+        return res
+          .status(401)
+          .json({ message: "Espere la aprobación del administrador." });
+      }
+
+      // Generar token de acceso con JWT
+      const response = { email: dbUser.email, rol: dbUser.rol };
+      const accessToken = jwt.sign(response, process.env.ACCESS_TOKEN, {
+        expiresIn: "8h",
+      });
+
+      return res.status(200).json({ token: accessToken });
+    } catch (compareError) {
+      return res.status(500).json({ message: "Error al verificar la contraseña." });
+    }
+  });
+});
+
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
@@ -81,7 +121,7 @@ router.post("/forgotPassword", (req, res) => {
         var mailOptions = {
           from: process.env.EMAIL,
           to: results[0].email,
-          subject: "Contraseña del proyecto joyeria",
+          subject: "Contraseña del proyecto Joyeria Gamma",
           html:
             "<p><b>Sus datos para el inicio de sesion para el proyecto joyeria</b><br><b>Correo electronico: </b>" +
             results[0].email +
@@ -149,37 +189,56 @@ router.get("/checkToken", auth.authenticateToken, (req, res) => {
 });
 
 //api de cambio de contraseña
-router.post("/changePassword", auth.authenticateToken, (req, res) => {
+router.post("/changePassword", auth.authenticateToken, async (req, res) => {
   const user = req.body;
   const email = res.locals.email;
-  console.log(email);
-  var query = "select *from user where email=? and contrasena=?";
-  connection.query(query, [email, user.oldPassword], (err, results) => {
-    if (!err) {
-      if (results.length <= 0) {
-        return res
-          .status(400)
-          .json({ mensaje: "La contraseña anterior es incorrecta" });
-      } else if (results[0].contrasena == user.oldPassword) {
-        query = "update user set contrasena=? where email=?";
-        connection.query(query, [user.newPassword, email], (err, results) => {
-          if (!err) {
-            return res
-              .status(200)
-              .json({ message: "La contraseña se actualizo con exito" });
-          } else {
-            return res.status(500).json(err);
-          }
-        });
-      } else {
-        return res
-          .status(400)
-          .json({ message: "Algo salio mal. Intentelo de nuevo mas tarde" });
+
+  const query = "SELECT contrasena FROM user WHERE email=?";
+  connection.query(query, [email], async (err, results) => {
+    if (err) return res.status(500).json(err);
+
+    if (results.length <= 0) {
+      return res.status(400).json({ message: "Usuario no encontrado." });
+    }
+
+    const storedPassword = results[0].contrasena;
+
+    try {
+      // Verificar si la contraseña es encriptada o texto plano
+      const isPasswordMatch =
+        storedPassword.startsWith("$2b$")
+          ? await bcrypt.compare(user.oldPassword, storedPassword) // Comparar hash
+          : storedPassword === user.oldPassword; // Comparar texto plano
+
+      if (!isPasswordMatch) {
+        return res.status(400).json({ message: "La contraseña anterior es incorrecta." });
       }
-    } else {
-      return res.status(500).json(err);
+
+      // Validar formato de la nueva contraseña
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+      if (!passwordRegex.test(user.newPassword)) {
+        return res.status(400).json({
+          message:
+            "La nueva contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula, una letra minúscula y un número.",
+        });
+      }
+
+      // Encriptar la nueva contraseña
+      const newHashedPassword = await bcrypt.hash(user.newPassword, 10);
+
+      // Actualizar la contraseña en la base de datos
+      const updateQuery = "UPDATE user SET contrasena=? WHERE email=?";
+      connection.query(updateQuery, [newHashedPassword, email], (err, results) => {
+        if (err) return res.status(500).json(err);
+
+        return res.status(200).json({ message: "La contraseña se actualizó con éxito." });
+      });
+    } catch (error) {
+      return res.status(500).json({ message: "Error al procesar la solicitud." });
     }
   });
 });
+
+
 
 module.exports = router;

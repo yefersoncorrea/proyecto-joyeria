@@ -16,7 +16,7 @@ import { saveAs } from 'file-saver';
   styleUrls: ['./view-bill.component.scss']
 })
 export class ViewBillComponent implements OnInit {
-  displayedColumns: string[] = ['nombre','email','numeroContacto','metodoPago','total','ver'];
+  displayedColumns: string[] = ['nombre','email','numeroContacto','metodoPago','total','fechaHora', 'ver'];
   dataSource:any;
   responseMessage:any;
 
